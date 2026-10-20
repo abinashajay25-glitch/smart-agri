@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RockstarsLens: An AI-Assisted Multimodal Image Analysis Framework for Food and Consumer Product Understanding</title>
+<style>
+  @page {
+    size: letter;
+    margin: 0.65in 0.6in 0.65in 0.6in;
+  }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 10pt;
+    line-height: 1.18;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+  .title-container {
+    text-align: center;
+    margin-bottom: 12pt;
+  }
+  h1.paper-title {
+    font-size: 20pt;
+    font-weight: normal;
+    margin: 0 0 10pt 0;
+    line-height: 1.25;
+  }
+  .author-block {
+    font-size: 10pt;
+    margin-bottom: 14pt;
+    line-height: 1.3;
+  }
+  .author-name {
+    font-size: 11pt;
+    font-weight: normal;
+  }
+  .author-dept {
+    font-style: italic;
+  }
+  .columns {
+    column-count: 2;
+    column-gap: 0.25in;
+    column-fill: balance;
+    text-align: justify;
+  }
+  .abstract-keywords {
+    font-size: 9pt;
+    line-height: 1.18;
+    margin-bottom: 10pt;
+  }
+  .abstract-title, .keywords-title {
+    font-weight: bold;
+    font-style: italic;
+  }
+  h2.section-heading {
+    font-size: 10pt;
+    font-weight: normal;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 10pt 0 4pt 0;
+    letter-spacing: 0.5px;
+    break-after: avoid;
+  }
+  h3.subsection-heading {
+    font-size: 10pt;
+    font-style: italic;
+    font-weight: normal;
+    margin: 8pt 0 3pt 0;
+    break-after: avoid;
+  }
+  p {
+    text-indent: 1em;
+    margin: 0 0 4pt 0;
+  }
+  p.no-indent {
+    text-indent: 0;
+  }
+  ul {
+    margin: 3pt 0 6pt 12pt;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 2pt;
+  }
+  ol {
+    margin: 3pt 0 6pt 14pt;
+    padding: 0;
+  }
+  table.ieee-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0;
+    font-size: 8.5pt;
+    line-height: 1.15;
+    text-align: left;
+    break-inside: avoid;
+  }
+  table.ieee-table caption {
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+    text-align: center;
+    font-weight: normal;
+  }
+  table.ieee-table th {
+    border-top: 1.2pt solid #000;
+    border-bottom: 0.6pt solid #000;
+    padding: 3pt 4pt;
+    font-weight: bold;
+  }
+  table.ieee-table td {
+    padding: 2.5pt 4pt;
+    border-bottom: 0.4pt solid #ddd;
+  }
+  table.ieee-table tr.last-row td {
+    border-bottom: 1.2pt solid #000;
+  }
+  .figure-box {
+    text-align: center;
+    margin: 10pt 0;
+    break-inside: avoid;
+  }
+  .figure-caption {
+    font-size: 8.5pt;
+    margin-top: 4pt;
+    text-align: justify;
+  }
+  .fig-label {
+    font-weight: normal;
+  }
+  code, tt {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 8.5pt;
+  }
+  .references {
+    font-size: 8pt;
+    line-height: 1.15;
+    margin-top: 10pt;
+  }
+  .ref-item {
+    text-indent: -1.2em;
+    padding-left: 1.2em;
+    margin-bottom: 3pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="title-container">
+  <h1 class="paper-title">RockstarsLens: An AI-Assisted Multimodal Image Analysis Framework for Food and Consumer Product Understanding</h1>
+  <div class="author-block">
+    <div class="author-name">Abinash Ajay N</div>
+    <div class="author-dept">Department of Artificial Intelligence and Data Science</div>
+    <div>Loyola Institution of Technology, Tamil Nadu, India</div>
+    <div>abinashajay25@gmail.com</div>
+  </div>
+</div>
+
+<div class="columns">
+
+  <div class="abstract-keywords">
+    <p class="no-indent"><span class="abstract-title">Abstract</span>—Reading product package details requires significant consumer effort. Key declarations—such as ingredient lists, manufacturing and expiration dates, maximum retail prices (MRP), country of origin, manufacturer contact details, and machine-readable barcodes—are often printed in fine typography and scattered across package surfaces. RockstarsLens is a web application framework designed to automate product package parsing, compliance verification, and information retrieval. The system combines a Node.js backend with a React/TypeScript single-page interface, integrating multi-pass barcode and QR decoding via ZXing, automated catalogue lookups across Open Food Facts, Open Beauty Facts, and Open Products Facts, and a vision-language model (Google Gemini 2.5 Flash, with NVIDIA-hosted Llama-3.2 11B Vision as fallback). By enforcing strict evidence-based constraints, the framework marks illegible or ambiguous fields as UNKNOWN or REVIEW rather than hallucinating values. We report an empirical evaluation of the barcode reading pipeline on 80 synthetic package images across five visual conditions (clean, rotated, blurred, low-contrast, and noisy). The decoder achieved a 90.0% overall detection rate with 100% precision on successfully decoded symbols, failing exclusively under severe Gaussian blur on EAN-13 barcodes. Furthermore, we outline a standardized 140-image protocol for future vision-language extraction benchmarking.</p>
+    <p class="no-indent" style="margin-top: 4pt;"><span class="keywords-title">Index Terms</span>—Multimodal AI, package label analysis, optical character recognition, barcode detection, QR code, compliance checking, Open Food Facts, vision-language models.</p>
+  </div>
+
+  <h2 class="section-heading">I. Introduction</h2>
+  <p>Navigating packaged consumer goods under standard retail conditions poses notable friction. Critical information regarding dietary safety, net quantity, pricing, manufacturing timelines, and customer care contacts is legally mandated but rarely organized for rapid consumer comprehension. Under poor store lighting or unfamiliar label layouts, consumers struggle to verify compliance or spot potential allergens.</p>
+  <p>While computer vision has advanced significantly in dietary recognition—such as identifying dish types in NutriNet [1] or estimating nutrient compositions from food photos [2], [3]—these methodologies target the physical food item itself. Packaged goods present an entirely distinct challenge: the primary target is printed text, regulatory stamps, and machine-readable symbols rather than food appearance.</p>
+  <p>RockstarsLens addresses this challenge at the application architecture level. Rather than introducing a custom vision backbone, it unifies off-the-shelf multimodal vision-language models (VLMs), structured prompt engineering, dual-path barcode/QR decoding, and open product database APIs into an explainable, consumer-facing framework.</p>
+  <p class="no-indent">The primary contributions of this work are as follows:</p>
+  <ul>
+    <li>A modular, full-stack web application (React 19 / TypeScript frontend, Node.js backend) capable of parsing single package photos into structured compliance and health reports.</li>
+    <li>A dual-path barcode reader pairing a 9-pass client-side decoder with a server-side <code>zxing-wasm</code> engine, automatically cross-referencing decoded barcodes against public product databases.</li>
+    <li>An evidence-constrained prompting scheme and post-processing filter that sanitizes VLM output, mapping low-confidence or illegible text to explicit <code>UNKNOWN</code> states.</li>
+    <li>An empirical benchmark of the code-reading pipeline on 80 synthetic images under controlled visual distortions, establishing performance baselines for server-side barcode extraction.</li>
+  </ul>
+
+  <h2 class="section-heading">II. Related Work</h2>
+  <h3 class="subsection-heading">A. Food and Beverage Image Recognition</h3>
+  <p>Early applications of deep learning to food images focused on image classification for dietary tracking. Mezgec and Koroušić Seljak introduced NutriNet [1], utilizing convolutional neural networks to classify food and beverage items. Subsequent works extended classification to volume and nutrient estimation across diverse meal datasets [2], [3]. These approaches demonstrate the efficacy of deep visual models but rely heavily on visual cues of un-packaged dishes.</p>
+
+  <h3 class="subsection-heading">B. Label OCR and Multi-Source Data Fusion</h3>
+  <p>Extracting text from packaged goods combines optical character recognition (OCR) with multi-modal data fusion. Standard OCR engines often degrade when encountering non-planar packaging surfaces, specular reflections, or stylized fonts. Recent advances in vision-language models enable joint visual and textual understanding under unstructured prompts. However, unconstrained VLM generation introduces hallucination risks, necessitating strict schema enforcement when applied to safety-critical package inspection.</p>
+
+  <h2 class="section-heading">III. System Design and Architecture</h2>
+  <p>The RockstarsLens system is built as a single-page React frontend backed by a Node.js HTTP server. Fig. 1 illustrates the overall data flow and component interactions.</p>
+
+  <div class="figure-box">
+    <svg width="100%" height="210" viewBox="0 0 320 210" style="background:#f9f9f9; border:1px solid #ccc; border-radius:4px;">
+      <rect x="110" y="10" width="100" height="24" rx="3" fill="#e1f5fe" stroke="#0288d1" stroke-width="1.2"/>
+      <text x="160" y="26" font-size="9" text-anchor="middle" font-family="sans-serif">User Image Capture</text>
+      
+      <line x1="160" y1="34" x2="160" y2="48" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+      
+      <rect x="80" y="48" width="160" height="28" rx="3" fill="#fff3e0" stroke="#f57c00" stroke-width="1.2"/>
+      <text x="160" y="60" font-size="8.5" text-anchor="middle" font-family="sans-serif" font-weight="bold">React 19 / TypeScript Client</text>
+      <text x="160" y="70" font-size="7.5" text-anchor="middle" font-family="sans-serif">Multi-pass ZXing & BarcodeDetector</text>
+
+      <line x1="160" y1="76" x2="160" y2="92" stroke="#333" stroke-width="1"/>
+
+      <rect x="60" y="92" width="200" height="34" rx="3" fill="#e8f5e9" stroke="#388e3c" stroke-width="1.2"/>
+      <text x="160" y="105" font-size="8.5" text-anchor="middle" font-family="sans-serif" font-weight="bold">Node.js HTTP Backend (server.mjs)</text>
+      <text x="160" y="117" font-size="7.5" text-anchor="middle" font-family="sans-serif">zxing-wasm Decoding & Open Food Facts Lookup</text>
+
+      <line x1="110" y1="126" x2="80" y2="148" stroke="#333" stroke-width="1"/>
+      <line x1="210" y1="126" x2="240" y2="148" stroke="#333" stroke-width="1"/>
+
+      <rect x="20" y="148" width="120" height="28" rx="3" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1.2"/>
+      <text x="80" y="160" font-size="8" text-anchor="middle" font-family="sans-serif" font-weight="bold">Gemini 2.5 Flash</text>
+      <text x="80" y="170" font-size="7" text-anchor="middle" font-family="sans-serif">(Primary Vision Model)</text>
+
+      <rect x="180" y="148" width="120" height="28" rx="3" fill="#ede7f6" stroke="#512da8" stroke-width="1.2"/>
+      <text x="240" y="160" font-size="8" text-anchor="middle" font-family="sans-serif" font-weight="bold">Llama-3.2 11B Vision</text>
+      <text x="240" y="170" font-size="7" text-anchor="middle" font-family="sans-serif">(NVIDIA Fallback)</text>
+
+      <line x1="80" y1="176" x2="160" y2="192" stroke="#333" stroke-width="1"/>
+      <line x1="240" y1="176" x2="160" y2="192" stroke="#333" stroke-width="1"/>
+
+      <rect x="90" y="190" width="140" height="16" rx="2" fill="#fff" stroke="#333" stroke-width="1"/>
+      <text x="160" y="201" font-size="8" text-anchor="middle" font-family="sans-serif">Structured JSON Compliance Report</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-label">Fig. 1.</span> Data flow architecture of RockstarsLens from image capture to structured report generation.</div>
+  </div>
+
+  <h3 class="subsection-heading">A. Data Processing Flow</h3>
+  <p>1) <em>Image Ingestion:</em> The client accepts package images up to 15 MB via file upload or camera capture.</p>
+  <p>2) <em>Client-Side Pre-Scan:</em> Before backend transmission, the browser executes up to nine local decoding passes (native <code>BarcodeDetector</code> and <code>@zxing/browser</code> across rotations, contrast filters, and central crops) to provide immediate user feedback.</p>
+  <p>3) <em>Server-Side Analysis:</em> The Node.js backend validates request payloads, re-scans the image using <code>zxing-wasm</code>, and queries public product databases if a numeric barcode (EAN-8, EAN-13, UPC-A) is identified.</p>
+  <p>4) <em>VLM Inference:</em> The image, along with any retrieved catalogue evidence, is formatted into a structured prompt and transmitted to Google Gemini 2.5 Flash (or NVIDIA Llama-3.2 11B Vision as fallback).</p>
+  <p>5) <em>Response Sanitization:</em> The backend validates JSON schema compliance, replaces placeholder strings, clamps numerical scores, and returns the final report.</p>
+
+  <h3 class="subsection-heading">B. Provider Credential Security</h3>
+  <p>All API keys (Gemini, NVIDIA, ElevenLabs) reside strictly in server-side environment variables and are never transmitted to the client. Images exist purely in volatile memory buffers during execution and are discarded immediately after request completion. Scan histories (up to 20 items) are maintained locally in browser <code>localStorage</code>.</p>
+
+  <h2 class="section-heading">IV. Implementation Details</h2>
+  <h3 class="subsection-heading">A. Technology Stack</h3>
+  <p class="no-indent">The complete technical stack implemented in the project repository is detailed in Table I.</p>
+
+  <table class="ieee-table">
+    <caption>TABLE I<br>Implementation Stack of the RockstarsLens Repository</caption>
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Technology / Module</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Frontend</td><td>React 19, TypeScript, Vite 8 (<code>src/App.tsx</code>)</td></tr>
+      <tr><td>Backend</td><td>Node.js ES module (<code>server.mjs</code>)</td></tr>
+      <tr><td>Primary Vision Model</td><td>Google Gemini 2.5 Flash</td></tr>
+      <tr><td>Fallback Vision Model</td><td>NVIDIA <code>meta/llama-3.2-11b-vision-instruct</code></td></tr>
+      <tr><td>Code Reader (Server)</td><td><code>zxing-wasm</code> 3 (try-harder mode)</td></tr>
+      <tr><td>Code Reader (Client)</td><td><code>@zxing/browser</code>, native <code>BarcodeDetector</code></td></tr>
+      <tr><td>External Catalogues</td><td>Open Food/Beauty/Products Facts (v2 API)</td></tr>
+      <tr><td>PDF Export & Speech</td><td><code>jsPDF</code>, Web Speech API / ElevenLabs</td></tr>
+      <tr class="last-row"><td>Hosting Environment</td><td>Render (<code>render.yaml</code>), GitHub repository</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-heading">B. Seven-Point Compliance Verification</h3>
+  <p class="no-indent">The core analysis pipeline evaluates package labels against a standard seven-point regulatory checklist:</p>
+  <ol>
+    <li>Maximum Retail Price (MRP)</li>
+    <li>Net Quantity Declaration</li>
+    <li>Manufacturing and Expiry/Best-Before Dates</li>
+    <li>Manufacturer Name and Physical Address</li>
+    <li>Consumer Care Contact Details (Phone/Email)</li>
+    <li>Country of Origin Statement</li>
+    <li>Batch / Lot Number & Overall Label Legibility</li>
+  </ol>
+  <p>Each check yields a status of <code>PASS</code>, <code>FAIL</code>, or <code>REVIEW</code>, accompanied by explicit field confidence ratings (<code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>).</p>
+
+  <h3 class="subsection-heading">C. Modular Capability Mapping</h3>
+  <p class="no-indent">Table II maps the functional modules present in the current repository compared to baseline manual inspection.</p>
+
+  <table class="ieee-table">
+    <caption>TABLE II<br>Coverage of Functional Feature Modules</caption>
+    <thead>
+      <tr>
+        <th>Module Category</th>
+        <th>Implementation Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Label Declarations</td><td>Fully implemented via <code>extractedInfo</code> schema block.</td></tr>
+      <tr><td>Ingredients & Allergens</td><td>Implemented within <code>health</code> intelligence block.</td></tr>
+      <tr><td>Expiry Analysis</td><td>Implemented with automatic <code>UNKNOWN</code> fallback.</td></tr>
+      <tr><td>Origin Verification</td><td>Implemented via checklist and dedicated field.</td></tr>
+      <tr><td>Compliance Checking</td><td>Implemented as 7-point checklist with score (0–100).</td></tr>
+      <tr><td>Counterfeit Screening</td><td>Partial (brand verification and risk flags).</td></tr>
+      <tr><td>Nutritional Analysis</td><td>Partial (Nutri-Score calculation included).</td></tr>
+      <tr class="last-row"><td>Eco-Packaging Check</td><td>Partial (packaging material statement extraction).</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-heading">V. Measured Experimental Evaluation</h2>
+  <h3 class="subsection-heading">A. Synthetic Code-Reading Benchmark</h3>
+  <p>To evaluate the barcode decoding path independently of VLM latency and API key availability, we generated an evaluation dataset of 80 synthetic test images (40 EAN-13 barcodes with valid check digits and 40 QR codes encoding URLs). Images were evaluated across five visual conditions (8 images per condition): clean, rotated 15°, Gaussian blur ($\sigma = 2.2$), low contrast (35%), and additive Gaussian noise ($\sigma = 28$).</p>
+  <p>Requests were dispatched to <code>/api/decode-barcode</code> on localhost. The results are summarized in Table III.</p>
+
+  <table class="ieee-table">
+    <caption>TABLE III<br>Server-Side Barcode Decoding Performance ($N=80$)</caption>
+    <thead>
+      <tr>
+        <th>Symbology</th>
+        <th>Total</th>
+        <th>Detected</th>
+        <th>Accuracy</th>
+        <th>Mean (ms)</th>
+        <th>p95 (ms)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>EAN-13</td><td>40</td><td>32</td><td>80.0%</td><td>71.6</td><td>152.9</td></tr>
+      <tr><td>QR Code</td><td>40</td><td>40</td><td>100.0%</td><td>50.8</td><td>139.0</td></tr>
+      <tr class="last-row"><td><strong>Overall</strong></td><td><strong>80</strong></td><td><strong>72</strong></td><td><strong>90.0%</strong></td><td><strong>61.2</strong></td><td><strong>—</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-heading">B. Robustness Analysis</h3>
+  <p>Decoding precision reached 100%: every successfully parsed symbol yielded the exact ground-truth payload. As shown in Fig. 2, failure modes were confined to a single condition: Gaussian blur on EAN-13 barcodes.</p>
+
+  <div class="figure-box">
+    <svg width="100%" height="160" viewBox="0 0 320 160" style="background:#fff; border:1px solid #ccc; border-radius:4px;">
+      <!-- Y Axis -->
+      <line x1="45" y1="15" x2="45" y2="125" stroke="#333" stroke-width="1"/>
+      <text x="38" y="20" font-size="7.5" text-anchor="end">100%</text>
+      <text x="38" y="47" font-size="7.5" text-anchor="end">75%</text>
+      <text x="38" y="73" font-size="7.5" text-anchor="end">50%</text>
+      <text x="38" y="99" font-size="7.5" text-anchor="end">25%</text>
+      <text x="38" y="125" font-size="7.5" text-anchor="end">0%</text>
+
+      <!-- Grid lines -->
+      <line x1="45" y1="18" x2="310" y2="18" stroke="#eee" stroke-dasharray="2,2"/>
+      <line x1="45" y1="45" x2="310" y2="45" stroke="#eee" stroke-dasharray="2,2"/>
+      <line x1="45" y1="71" x2="310" y2="71" stroke="#eee" stroke-dasharray="2,2"/>
+      <line x1="45" y1="98" x2="310" y2="98" stroke="#eee" stroke-dasharray="2,2"/>
+
+      <!-- X Axis -->
+      <line x1="45" y1="125" x2="310" y2="125" stroke="#333" stroke-width="1"/>
+
+      <!-- Condition 1: Clean -->
+      <rect x="55" y="18" width="18" height="107" fill="#1565c0"/>
+      <rect x="75" y="18" width="18" height="107" fill="#2e7d32"/>
+      <text x="74" y="137" font-size="7.5" text-anchor="middle">Clean</text>
+
+      <!-- Condition 2: Rotated -->
+      <rect x="105" y="18" width="18" height="107" fill="#1565c0"/>
+      <rect x="125" y="18" width="18" height="107" fill="#2e7d32"/>
+      <text x="124" y="137" font-size="7.5" text-anchor="middle">Rotated 15°</text>
+
+      <!-- Condition 3: Gaussian Blur -->
+      <rect x="155" y="125" width="18" height="0" fill="#1565c0"/>
+      <rect x="175" y="18" width="18" height="107" fill="#2e7d32"/>
+      <text x="174" y="137" font-size="7.5" text-anchor="middle">Gauss Blur</text>
+
+      <!-- Condition 4: Low Contrast -->
+      <rect x="205" y="18" width="18" height="107" fill="#1565c0"/>
+      <rect x="225" y="18" width="18" height="107" fill="#2e7d32"/>
+      <text x="224" y="137" font-size="7.5" text-anchor="middle">Low Contrast</text>
+
+      <!-- Condition 5: Gaussian Noise -->
+      <rect x="255" y="18" width="18" height="107" fill="#1565c0"/>
+      <rect x="275" y="18" width="18" height="107" fill="#2e7d32"/>
+      <text x="274" y="137" font-size="7.5" text-anchor="middle">Noise</text>
+
+      <!-- Legend -->
+      <rect x="190" y="4" width="10" height="8" fill="#1565c0"/>
+      <text x="204" y="11" font-size="7.5">EAN-13 (1D)</text>
+      <rect x="250" y="4" width="10" height="8" fill="#2e7d32"/>
+      <text x="264" y="11" font-size="7.5">QR Code (2D)</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-label">Fig. 2.</span> Detection rate across five visual test conditions (8 images per condition).</div>
+  </div>
+
+  <p>The high density and narrow bar widths of 1D EAN-13 symbols make them susceptible to spatial blurring, whereas 2D QR codes preserved sufficient corner finder patterns to achieve 100% recovery across all conditions.</p>
+
+  <h3 class="subsection-heading">C. Planned Vision-Language Evaluation Protocol</h3>
+  <p>While the barcode decoding subsystem has been empirically validated, VLM text extraction requires multi-annotator ground truth verification. We specify a formal protocol targeting 140 diverse real-world product photographs across seven categories, as outlined in Table IV.</p>
+
+  <table class="ieee-table">
+    <caption>TABLE IV<br>Proposed Dataset Distribution for VLM Evaluation</caption>
+    <thead>
+      <tr>
+        <th>Product Category</th>
+        <th>Target Sample Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Packaged Food</td><td>20</td></tr>
+      <tr><td>Beverages</td><td>20</td></tr>
+      <tr><td>Personal Care & Cosmetics</td><td>20</td></tr>
+      <tr><td>Household Cleaning Products</td><td>20</td></tr>
+      <tr><td>Nutrition Labels (Close-up)</td><td>20</td></tr>
+      <tr><td>Barcode-Bearing Packaging</td><td>20</td></tr>
+      <tr class="last-row"><td>QR Code-Bearing Packaging</td><td>20</td></tr>
+      <tr class="last-row"><td><strong>Total Proposed Dataset</strong></td><td><strong>140+</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>Under this protocol, ground-truth annotations will be established by two independent reviewers, with discrepancies settled by a third arbitrator. Evaluation metrics will include Character Error Rate (CER), Word Error Rate (WER), precision, recall, and field completeness.</p>
+
+  <h2 class="section-heading">VI. Discussion and Limitations</h2>
+  <p>RockstarsLens operates on an evidence-first principle: when visual quality is inadequate, the framework explicitly outputs <code>UNKNOWN</code> or <code>NEEDS_REVIEW</code> rather than inferring missing values. While this prevents false assertions in compliance reports, several system limitations remain:</p>
+  <ol>
+    <li><em>Blur Sensitivity:</em> 1D barcode decoding degrades rapidly under spatial blur, highlighting the need for image sharpening preprocessing or retake warnings.</li>
+    <li><em>Catalogue Coverage Gaps:</em> Niche regional products may lack entries in Open Food Facts, limiting catalogue-based reconciliation.</li>
+    <li><em>Non-Proof of Authenticity:</em> Visual packaging inspection cannot substitute for laboratory chemical testing or official forensic verification.</li>
+  </ol>
+
+  <h2 class="section-heading">VII. Conclusion and Future Work</h2>
+  <p>This paper presented RockstarsLens, a web-based multimodal analysis framework for consumer product understanding. The system successfully combines vision-language models, structured prompting, dual-path barcode decoding, and open product database lookups. Empirical testing of the server-side code-reading pipeline established a 90.0% overall detection rate with zero false-positive decodes across 80 synthetic images.</p>
+  <p>Future work will execute the 140-image VLM evaluation protocol, integrate client-side image enhancement filters, expand multi-language translation support, and implement automated rate-limiting and authentication controls for production deployment.</p>
+
+  <div class="references">
+    <h2 class="section-heading" style="font-size: 9pt; margin-bottom: 6pt;">References</h2>
+    <div class="ref-item">[1] S. Mezgec and B. Koroušić Seljak, “NutriNet: A deep learning food and drink image recognition system for dietary assessment,” <em>Nutrients</em>, vol. 9, no. 7, p. 657, 2017.</div>
+    <div class="ref-item">[2] P. Ma et al., “Image-based nutrient estimation for Chinese dishes using deep learning,” <em>Food Research International</em>, vol. 147, Art. no. 110437, 2021.</div>
+    <div class="ref-item">[3] P. Ma et al., “Application of deep learning for image-based Chinese market food nutrients estimation,” <em>Food Chemistry</em>, vol. 373, Art. no. 130994, 2022.</div>
+    <div class="ref-item">[4] Open Food Facts contributors, “Open Food Facts Database,” https://world.openfoodfacts.org, 2026.</div>
+    <div class="ref-item">[5] ZXing Project, “ZXing (‘Zebra Crossing’) barcode scanning library,” https://github.com/zxing/zxing, 2026.</div>
+  </div>
+
+</div>
+
+</body>
+</html>
